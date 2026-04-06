@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShieldX - Smart Email Shield</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #172a45 50%, #1e3a5f 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 30, 60, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 9999;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #60a5fa;
+            box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
+        }
+        
+        .brand {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .brand h1 {
+            font-size: 22px;
+            color: #fff;
+            margin-bottom: 3px;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(59, 130, 246, 0.5);
+        }
+        
+        .brand p {
+            font-size: 11px;
+            color: #8899aa;
+        }
+        
+        .status-badge {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            box-shadow: 0 2px 10px rgba(34, 197, 94, 0.2);
+        }
+        
+        .refresh-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 15px;
+            gap: 10px;
+            background-color: #3b82f6;
+            outline: 3px #3b82f6 solid;
+            outline-offset: -3px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: 400ms;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .refresh-btn span {
+            color: white;
+            font-weight: 700;
+            transition: 400ms;
+        }
+        
+        .refresh-btn svg {
+            width: 16px;
+            height: 16px;
+            transition: 400ms;
+        }
+        
+        .refresh-btn svg path,
+        .refresh-btn svg polyline {
+            stroke: white;
+            transition: 400ms;
+        }
+        
+        .refresh-btn:hover {
+            background-color: transparent;
+        }
+        
+        .refresh-btn:hover span {
+            color: #3b82f6;
+        }
+        
+        .refresh-btn:hover svg path,
+        .refresh-btn:hover svg polyline {
+            stroke: #3b82f6;
+        }
+        
+        .refresh-btn.loading svg {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .refresh-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 22, 40, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .loading-overlay.show {
+            display: flex;
+        }
+        
+        .loading-text {
+            color: #3b82f6;
+            font-size: 18px;
+            font-weight: 600;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Loader Animation */
+        .loader {
+            position: relative;
+            width: 75px;
+            height: 100px;
+        }
+
+        .loader__bar {
+            position: absolute;
+            bottom: 0;
+            width: 10px;
+            height: 50%;
+            background: rgb(59, 130, 246);
+            transform-origin: center bottom;
+            box-shadow: 1px 1px 0 rgba(59, 130, 246, 0.2);
+        }
+
+        .loader__bar:nth-child(1) {
+            left: 0px;
+            transform: scale(1, 0.2);
+            animation: barUp1 4s infinite;
+        }
+
+        .loader__bar:nth-child(2) {
+            left: 15px;
+            transform: scale(1, 0.4);
+            animation: barUp2 4s infinite;
+        }
+
+        .loader__bar:nth-child(3) {
+            left: 30px;
+            transform: scale(1, 0.6);
+            animation: barUp3 4s infinite;
+        }
+
+        .loader__bar:nth-child(4) {
+            left: 45px;
+            transform: scale(1, 0.8);
+            animation: barUp4 4s infinite;
+        }
+
+        .loader__bar:nth-child(5) {
+            left: 60px;
+            transform: scale(1, 1);
+            animation: barUp5 4s infinite;
+        }
+
+        .loader__ball {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 10px;
+            height: 10px;
+            background: rgb(34, 197, 94);
+            border-radius: 50%;
+            animation: ball624 4s infinite;
+        }
+
+        @keyframes ball624 {
+            0% { transform: translate(0, 0); }
+            5% { transform: translate(8px, -14px); }
+            10% { transform: translate(15px, -10px); }
+            17% { transform: translate(23px, -24px); }
+            20% { transform: translate(30px, -20px); }
+            27% { transform: translate(38px, -34px); }
+            30% { transform: translate(45px, -30px); }
+            37% { transform: translate(53px, -44px); }
+            40% { transform: translate(60px, -40px); }
+            50% { transform: translate(60px, 0); }
+            57% { transform: translate(53px, -14px); }
+            60% { transform: translate(45px, -10px); }
+            67% { transform: translate(37px, -24px); }
+            70% { transform: translate(30px, -20px); }
+            77% { transform: translate(22px, -34px); }
+            80% { transform: translate(15px, -30px); }
+            87% { transform: translate(7px, -44px); }
+            90% { transform: translate(0, -40px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        @keyframes barUp1 {
+            0% { transform: scale(1, 0.2); }
+            40% { transform: scale(1, 0.2); }
+            50% { transform: scale(1, 1); }
+            90% { transform: scale(1, 1); }
+            100% { transform: scale(1, 0.2); }
+        }
+
+        @keyframes barUp2 {
+            0% { transform: scale(1, 0.4); }
+            40% { transform: scale(1, 0.4); }
+            50% { transform: scale(1, 0.8); }
+            90% { transform: scale(1, 0.8); }
+            100% { transform: scale(1, 0.4); }
+        }
+
+        @keyframes barUp3 {
+            0% { transform: scale(1, 0.6); }
+            100% { transform: scale(1, 0.6); }
+        }
+
+        @keyframes barUp4 {
+            0% { transform: scale(1, 0.8); }
+            40% { transform: scale(1, 0.8); }
+            50% { transform: scale(1, 0.4); }
+            90% { transform: scale(1, 0.4); }
+            100% { transform: scale(1, 0.8); }
+        }
+
+        @keyframes barUp5 {
+            0% { transform: scale(1, 1); }
+            40% { transform: scale(1, 1); }
+            50% { transform: scale(1, 0.2); }
+            90% { transform: scale(1, 0.2); }
+            100% { transform: scale(1, 1); }
+        }
+        
+        .user-profile {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            z-index: 10001;
+        }
+        
+        .user-profile:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .user-profile svg {
+            width: 22px;
+            height: 22px;
+        }
+        
+        .profile-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: rgba(15, 30, 60, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            border-radius: 8px;
+            padding: 10px 0;
+            min-width: 200px;
+            display: none;
+            z-index: 10000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .profile-dropdown.show {
+            display: block;
+        }
+        
+        .profile-dropdown-item {
+            padding: 12px 20px;
+            color: #e0e0e0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        
+        .profile-dropdown-item:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+        }
+        
+        .profile-dropdown-item svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Report Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 150; /* keep report confirmation above header/profile */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        .modal-content {
+            background: rgba(15, 30, 60, 0.95);
+            backdrop-filter: blur(20px);
+            margin: 15% auto;
+            padding: 30px;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            color: #fff;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        
+        .modal-close:hover {
+            color: #fff;
+        }
+        
+        .modal-body {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+        
+        .modal-body p {
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .modal-domain {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px 20px;
+            gap: 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 15px;
+            transition: 400ms;
+        }
+        
+        .modal-btn-confirm {
+            background-color: #ef4444;
+            outline: 3px #ef4444 solid;
+            outline-offset: -3px;
+            color: white;
+        }
+        
+        .modal-btn-confirm:hover {
+            background-color: transparent;
+            color: #ef4444;
+        }
+        
+        .modal-btn-cancel {
+            background-color: #64748b;
+            outline: 3px #64748b solid;
+            outline-offset: -3px;
+            color: white;
+        }
+        
+        .modal-btn-cancel:hover {
+            background-color: transparent;
+            color: #64748b;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stat-card {
+            background: rgba(15, 30, 60, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stat-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(59, 130, 246, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border-color: rgba(96, 165, 250, 0.4);
+        }
+        
+        .stat-info h3 {
+            font-size: 13px;
+            color: #8899aa;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .stat-info .number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .stat-icon {
+            font-size: 36px;
+        }
+        
+        .stat-card.safe { border-left: 3px solid #22c55e; }
+        .stat-card.phishing { border-left: 3px solid #ef4444; }
+        .stat-card.scam { border-left: 3px solid #f97316; }
+        
+        .risk-badge-large {
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .risk-badge-large.low {
+            background: #16a34a;
+        }
+        
+        .risk-badge-large.medium {
+            background: #ca8a04;
+        }
+        
+        .risk-badge-large.high {
+            background: #dc2626;
+        }
+        
+        /* Main Content Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 25px;
+        }
+        
+        /* Email Table */
+        .email-section {
+            background: rgba(15, 30, 60, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .section-header {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        /* Radio Group Tabs */
+        .radio-group {
+            display: flex;
+            position: relative;
+            background: rgba(15, 30, 60, 0.5);
+            backdrop-filter: blur(5px);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+        }
+        
+        .slider {
+            position: absolute;
+            height: calc(100% - 8px);
+            width: calc(20% - 4px);
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 6px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            top: 4px;
+            left: 4px;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            z-index: 1;
+        }
+        
+        .radio-option {
+            flex: 1;
+            z-index: 2;
+        }
+        
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+        
+        .radio-label {
+            display: block;
+            text-align: center;
+            padding: 10px 12px;
+            cursor: pointer;
+            color: #8899aa;
+            font-size: 13px;
+            font-weight: 600;
+            transition: color 0.3s;
+            user-select: none;
+        }
+        
+        .radio-option input[type="radio"]:checked + .radio-label {
+            color: #fff;
+        }
+        
+        .email-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .email-table thead {
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .email-table th {
+            text-align: left;
+            padding: 12px;
+            font-size: 12px;
+            color: #8899aa;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .email-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 14px;
+        }
+        
+        .email-table tbody tr:not(.email-body-row) {
+            transition: all 0.3s ease;
+        }
+        
+        .email-table tbody tr:not(.email-body-row):hover {
+            background: rgba(59, 130, 246, 0.08);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5), 
+                        0 0 40px rgba(59, 130, 246, 0.3),
+                        inset 0 0 20px rgba(59, 130, 246, 0.1);
+            border-left: 2px solid #3b82f6;
+        }
+        
+        .email-body-row {
+            background: rgba(10, 22, 40, 0.8) !important;
+        }
+        
+        .email-body-row:hover {
+            background: rgba(10, 22, 40, 0.8) !important;
+            border-left: none !important;
+        }
+        
+        .threat-badge {
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .threat-badge.phishing {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        .threat-badge.scam {
+            background: rgba(249, 115, 22, 0.2);
+            color: #f97316;
+        }
+        
+        .threat-badge.spam {
+            background: rgba(234, 179, 8, 0.2);
+            color: #eab308;
+        }
+        
+        .threat-badge.safe {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+        
+        .risk-badge {
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .risk-badge.high {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+        }
+        
+        .risk-badge.med {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
+        }
+        
+        .risk-badge.low {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+        }
+        
+        .confidence {
+            color: #8899aa;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-self: start;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .sidebar-card {
+            background: rgba(15, 30, 60, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border-color: rgba(96, 165, 250, 0.4);
+        }
+        
+        .card-title {
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .chart-placeholder {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .chart-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: rgba(20, 30, 48, 0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .chart-percentage {
+            font-size: 32px;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+        
+        .legend {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .legend-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+        
+        .legend-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .alert-box {
+            background: rgba(220, 38, 38, 0.15);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-box h4 {
+            color: #ef4444;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .alert-box p {
+            color: #fca5a5;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        
+        .alert-link {
+            color: #60a5fa;
+            font-size: 12px;
+        }
+        
+        .danger-reasons {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .danger-reasons li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 13px;
+            color: #cbd5e1;
+        }
+        
+        .danger-reasons li:before {
+            content: "●";
+            color: #ef4444;
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-right: 8px;
+        }
+        
+        .report-btn {
+            background: transparent;
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.3s;
+        }
+        
+        .report-btn:hover {
+            background: #ef4444;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader">
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__bar"></div>
+            <div class="loader__ball"></div>
+        </div>
+        <div class="loading-text">Checking for new emails...</div>
+    </div>
+    
+    <div class="dashboard">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <img src="/static/Icon.png" alt="ShieldX Logo">
+                </div>
+                <div class="brand">
+                    <h1>ShieldX</h1>
+                    <p>Fake Email & Phishing Detection System</p>
+                </div>
+                <div class="status-badge">
+                    <span>Inbox Protected</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="16" height="16">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                </div>
+                <button class="refresh-btn" onclick="refreshEmails()" id="refreshBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"/>
+                        <polyline points="1 20 1 14 7 14"/>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                    </svg>
+                    <span id="refreshText">Refresh</span>
+                </button>
+            </div>
+            <div class="user-profile" onclick="toggleProfileDropdown()">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                </svg>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="profile-dropdown-item" onclick="window.location.href='/profile'">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        <span>My Profile</span>
+                    </div>
+                    <div class="profile-dropdown-item" onclick="window.location.href='/settings'">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <span>Settings</span>
+                    </div>
+                    <div class="profile-dropdown-item" onclick="window.location.href='/reports'">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                        <span>My Reports</span>
+                    </div>
+                    <div class="profile-dropdown-item" onclick="logout()" style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 5px; padding-top: 10px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        <span>Logout</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Total Emails Scanned</h3>
+                    <div class="number">{{ stats.total }}</div>
+                </div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="stat-card safe">
+                <div class="stat-info">
+                    <h3>Safe Emails</h3>
+                    <div class="number">{{ stats.safe }}</div>
+                </div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="stat-card phishing">
+                <div class="stat-info">
+                    <h3>Phishing Detected</h3>
+                    <div class="number">{{ stats.phishing }}</div>
+                </div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" width="32" height="32">
+                        <circle cx="12" cy="12" r="10" fill="#ef4444" opacity="0.2"/>
+                        <circle cx="12" cy="12" r="10" stroke="#ef4444" stroke-width="2" fill="none"/>
+                        <line x1="12" y1="7" x2="12" y2="13" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+                        <circle cx="12" cy="16" r="1" fill="#ef4444"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="stat-card scam">
+                <div class="stat-info">
+                    <h3>Suspicious Emails</h3>
+                    <div class="number">{{ stats.suspicious }}</div>
+                </div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
+                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" opacity="0.5"/>
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="#f97316"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Risk Level</h3>
+                    <div class="risk-badge-large {% if stats.overall_risk == 'HIGH' %}high{% elif stats.overall_risk == 'MEDIUM' %}medium{% else %}low{% endif %}">
+                        {% if stats.overall_risk == 'HIGH' %}
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="display: inline-block; vertical-align: middle;">
+                                <circle cx="12" cy="12" r="10"/>
+                            </svg> HIGH
+                        {% elif stats.overall_risk == 'MEDIUM' %}
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="display: inline-block; vertical-align: middle;">
+                                <circle cx="12" cy="12" r="10"/>
+                            </svg> MEDIUM
+                        {% else %}
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="display: inline-block; vertical-align: middle;">
+                                <circle cx="12" cy="12" r="10"/>
+                            </svg> LOW
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Email Table -->
+            <div class="email-section">
+                <h2 class="section-header">Email Threats</h2>
+                
+                <div class="radio-group">
+                    <div class="slider"></div>
+                    <div class="radio-option">
+                        <input type="radio" name="emailFilter" id="option1" checked="" onchange="filterEmails('all')" />
+                        <label for="option1" class="radio-label">All</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="emailFilter" id="option2" onchange="filterEmails('safe')" />
+                        <label for="option2" class="radio-label">Safe</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="emailFilter" id="option3" onchange="filterEmails('spam')" />
+                        <label for="option3" class="radio-label">Spam</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="emailFilter" id="option4" onchange="filterEmails('phishing')" />
+                        <label for="option4" class="radio-label">Phishing</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="emailFilter" id="option5" onchange="filterEmails('scam')" />
+                        <label for="option5" class="radio-label">Scam</label>
+                    </div>
+                </div>
+                
+                <table class="email-table">
+                    <thead>
+                        <tr>
+                            <th>Sender</th>
+                            <th>Subject</th>
+                            <th>Preview</th>
+                            <th>Threat Type</th>
+                            <th>Risk</th>
+                            <th>Score</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for email in emails %}
+                        <tr data-category="{% if email.risk == 'HIGH RISK' %}phishing{% elif email.risk == 'SUSPICIOUS' %}scam{% else %}safe{% endif %}" 
+                            data-email-data="{{ email | tojson | forceescape }}"
+                            onclick="showEmailDetailsFromRow(this);" 
+                            style="cursor: pointer;">
+                            <td>{{ email.sender }}</td>
+                            <td>{{ email.subject }}</td>
+                            <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: #8899aa;">{{ email.body[:100] }}...</td>
+                            <td>
+                                {% if email.risk == "HIGH RISK" %}
+                                    <span class="threat-badge phishing">Phishing</span>
+                                {% elif email.risk == "SUSPICIOUS" %}
+                                    <span class="threat-badge scam">Fake Job Scam</span>
+                                {% else %}
+                                    <span class="threat-badge safe">Safe</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if email.risk == "HIGH RISK" %}
+                                    <span class="risk-badge high">High</span>
+                                {% elif email.risk == "SUSPICIOUS" %}
+                                    <span class="risk-badge med">Med</span>
+                                {% else %}
+                                    <span class="risk-badge low">Low</span>
+                                {% endif %}
+                            </td>
+                            <td class="confidence" style="font-weight: bold; color: {% if email.risk_score < 30 %}#22c55e{% elif email.risk_score < 50 %}#84cc16{% elif email.risk_score < 70 %}#eab308{% elif email.risk_score < 85 %}#f97316{% else %}#ef4444{% endif %};">{{ email.risk_score }}</td>
+                            <td>
+                                <button class="report-btn" onclick="event.stopPropagation(); reportScam('{{ email.sender_domain }}')">🚩 Report</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sender Information -->
+                <div class="sidebar-card" id="senderInfoCard">
+                    <h3 class="card-title">👤 Sender Information</h3>
+                    <div id="senderInfoContent" style="color: #8899aa; padding: 20px; text-align: center;">
+                        Select an email to view sender details
+                    </div>
+                </div>
+
+                <!-- Security Issues -->
+                <div class="sidebar-card" id="securityIssuesCard">
+                    <h3 class="card-title">🔒 Security Issues</h3>
+                    <div id="securityIssuesContent" style="color: #8899aa; padding: 20px; text-align: center;">
+                        Select an email to view security analysis
+                    </div>
+                </div>
+
+                <!-- Email Body Analysis -->
+                <div class="sidebar-card" id="emailBodyCard">
+                    <h3 class="card-title">📧 Email Body Analysis</h3>
+                    <div id="emailBodyContent" style="color: #8899aa; padding: 20px; text-align: center;">
+                        Select an email to view body analysis
+                    </div>
+                </div>
+                    </div>
+                    <div id="emailBodyContent" style="background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.6; max-height: 300px; overflow-y: auto; white-space: pre-wrap; word-wrap: break-word;">
+                    </div>
+                    <div id="emailFlags" style="margin-top: 15px; display: none;">
+                        <strong style="color: #f97316;">⚠️ Detection Flags:</strong>
+                        <ul id="emailFlagsList" style="margin-top: 8px; padding-left: 20px; color: #fbbf24;">
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Phishing Alert -->
+                {% if stats.phishing > 0 %}
+                <div class="sidebar-card">
+                    <h3 class="card-title">Alert: Phishing Detected!</h3>
+                    <div class="alert-box">
+                        <h4>&#x26A0; Warning: "Verify your account immediately"</h4>
+                        <p>Suspicious Link: <span class="alert-link">http://fake-verify.com</span></p>
+                    </div>
+                    
+                    <h4 class="card-title" style="font-size: 14px; margin-top: 15px;">Why This Email Is Dangerous</h4>
+                    <ul class="danger-reasons">
+                        <li>Urgent account verification request</li>
+                        <li>Suspicious link detected</li>
+                        <li>Threat of account suspension</li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Report Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    Report Suspicious Email
+                </h2>
+                <button class="modal-close" onclick="closeReportModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>You are about to report the following domain as suspicious to our community intelligence system:</p>
+                <div class="modal-domain" id="reportDomain"></div>
+                <p>This helps protect other users from potential phishing attacks. Your report will be reviewed and added to our threat database.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeReportModal()">Cancel</button>
+                <button class="modal-btn modal-btn-confirm" onclick="confirmReport()">Confirm Report</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Logout Modal -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Confirm Logout
+                </h2>
+                <button class="modal-close" onclick="closeLogoutModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to logout from ShieldX?</p>
+                <p style="color: #8899aa; font-size: 13px;">You'll need to reconnect your Gmail account to access the dashboard again.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeLogoutModal()">Stay Logged In</button>
+                <button class="modal-btn modal-btn-confirm" onclick="confirmLogout()">Yes, Logout</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentReportDomain = null;
+        
+        function showEmailDetailsFromRow(row) {
+            try {
+                const emailData = JSON.parse(row.getAttribute('data-email-data'));
+                showEmailDetails(emailData);
+            } catch (e) {
+                console.error('Error parsing email data:', e);
+            }
+        }
+        
+        function showEmailDetails(emailData) {
+            // Populate Sender Information
+            const senderInfo = document.getElementById('senderInfoContent');
+            senderInfo.innerHTML = `
+                <div style="text-align: left;">
+                    <div style="margin-bottom: 15px;">
+                        <span style="color: #8899aa; font-size: 12px;">Email Address:</span>
+                        <div style="color: #e0e0e0; font-weight: 500; margin-top: 4px; word-break: break-all;">${emailData.email || 'N/A'}</div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <span style="color: #8899aa; font-size: 12px;">Claimable Name:</span>
+                        <div style="color: #e0e0e0; font-weight: 500; margin-top: 4px;">${emailData.claimable_name || 'N/A'}</div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <span style="color: #8899aa; font-size: 12px;">Domain:</span>
+                        <div style="color: #e0e0e0; font-weight: 500; margin-top: 4px;">${emailData.domain || 'N/A'}</div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <span style="color: #8899aa; font-size: 12px;">Free Email:</span>
+                        <div style="color: ${emailData.is_free_email ? '#f97316' : '#22c55e'}; font-weight: 500; margin-top: 4px;">
+                            ${emailData.is_free_email ? 'Yes' : 'No'}
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <span style="color: #8899aa; font-size: 12px;">Email Age:</span>
+                        <div style="color: #e0e0e0; font-weight: 500; margin-top: 4px;">${emailData.email_age || 'N/A'}</div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <span style="color: #8899aa; font-size: 12px;">Reputation Score:</span>
+                        <div style="color: ${(emailData.reputation_score || 0) >= 70 ? '#22c55e' : (emailData.reputation_score || 0) >= 40 ? '#eab308' : '#ef4444'}; font-weight: 700; margin-top: 4px; font-size: 18px;">
+                            ${emailData.reputation_score || 0}/100
+                        </div>
+                    </div>
+                    ${emailData.ml_confidence !== undefined ? `
+                    <div style="margin-bottom: 15px; padding: 12px; background: rgba(96, 165, 250, 0.1); border-radius: 6px; border-left: 3px solid #60a5fa;">
+                        <span style="color: #8899aa; font-size: 12px;">🤖 ML Confidence:</span>
+                        <div style="color: ${emailData.ml_confidence >= 0.7 ? '#ef4444' : emailData.ml_confidence >= 0.4 ? '#f97316' : '#22c55e'}; font-weight: 700; margin-top: 4px; font-size: 16px;">
+                            ${(emailData.ml_confidence * 100).toFixed(1)}%
+                        </div>
+                        <div style="color: #8899aa; font-size: 11px; margin-top: 4px;">
+                            ${emailData.detection_method || 'Rule-Based Only'}
+                        </div>
+                    </div>
+                    ` : ''}
+                    ${emailData.brand_issues && emailData.brand_issues.length > 0 ? `
+                    <div style="margin-top: 15px; padding: 10px; background: rgba(239, 68, 68, 0.15); border-radius: 6px; border-left: 3px solid #ef4444;">
+                        <strong style="color: #ef4444; font-size: 13px;">⚠️ Brand Issues:</strong>
+                        <ul style="margin: 8px 0 0 20px; color: #fbbf24; font-size: 12px;">
+                            ${emailData.brand_issues.map(issue => `<li>${issue}</li>`).join('')}
+                        </ul>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            // Populate Security Issues
+            const securityIssues = document.getElementById('securityIssuesContent');
+            if (emailData.issues && emailData.issues.length > 0) {
+                securityIssues.innerHTML = `
+                    <ul style="margin: 0; padding-left: 20px; color: #fbbf24; font-size: 13px; line-height: 1.8; text-align: left;">
+                        ${emailData.issues.map(issue => `<li>${issue}</li>`).join('')}
+                    </ul>
+                `;
+            } else {
+                securityIssues.innerHTML = `<div style="color: #22c55e; padding: 20px; text-align: center;">✅ No security issues detected</div>`;
+            }
+            
+            // Populate Email Body Analysis
+            const emailBody = document.getElementById('emailBodyContent');
+            const borderColor = emailData.risk === 'HIGH RISK' ? '#ef4444' : emailData.risk === 'SUSPICIOUS' ? '#f97316' : '#3b82f6';
+            
+            emailBody.innerHTML = `
+                <div style="text-align: left;">
+                    <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(136, 153, 170, 0.2);">
+                        <div style="font-size: 14px; color: #60a5fa; font-weight: 600; margin-bottom: 8px;">${emailData.subject || 'No Subject'}</div>
+                        <div style="font-size: 12px; color: #8899aa;">From: ${emailData.sender || 'Unknown'}</div>
+                    </div>
+                    <div style="color: #e0e0e0; font-size: 13px; line-height: 1.6; max-height: 200px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; padding-right: 5px;">
+                        ${emailData.body || 'No content available'}
+                    </div>
+                    ${emailData.risk_flags && emailData.risk_flags.length > 0 ? `
+                    <div style="margin-top: 15px; padding: 12px; background: rgba(239, 68, 68, 0.15); border-radius: 6px; border-left: 3px solid ${borderColor};">
+                        <strong style="color: ${borderColor}; font-size: 13px; margin-bottom: 8px; display: block;">⚠️ Detected Flags:</strong>
+                        <ul style="margin: 0; padding-left: 20px; color: #fbbf24; font-size: 12px; line-height: 1.6;">
+                            ${emailData.risk_flags.map(flag => `<li>${flag}</li>`).join('')}
+                        </ul>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        function toggleEmailRow(rowId) {
+            const bodyRow = document.getElementById(rowId);
+            if (bodyRow.style.display === 'none') {
+                bodyRow.style.display = 'table-row';
+            } else {
+                bodyRow.style.display = 'none';
+            }
+        }
+        
+        function showEmailBody(subject, sender, body, flags, borderColor) {
+            // Show the sidebar analysis card
+            const analysisCard = document.getElementById('emailBodyAnalysis');
+            analysisCard.style.display = 'block';
+            analysisCard.style.borderLeft = `3px solid ${borderColor}`;
+            
+            // Populate the content
+            document.getElementById('emailSubject').textContent = subject;
+            document.getElementById('emailSender').textContent = 'From: ' + sender;
+            document.getElementById('emailBodyContent').textContent = body;
+            
+            // Show flags if any
+            const flagsDiv = document.getElementById('emailFlags');
+            const flagsList = document.getElementById('emailFlagsList');
+            
+            if (flags && flags.length > 0) {
+                flagsDiv.style.display = 'block';
+                flagsList.innerHTML = '';
+                flags.forEach(flag => {
+                    const li = document.createElement('li');
+                    li.textContent = flag;
+                    flagsList.appendChild(li);
+                });
+            } else {
+                flagsDiv.style.display = 'none';
+            }
+            
+            // Scroll sidebar into view
+            analysisCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('show');
+        }
+        
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.closest('.user-profile')) {
+                const dropdown = document.getElementById('profileDropdown');
+                if (dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                }
+            }
+            
+            // Close report modal when clicking outside
+            if (event.target.id === 'reportModal') {
+                closeReportModal();
+            }
+            
+            // Close logout modal when clicking outside
+            if (event.target.id === 'logoutModal') {
+                closeLogoutModal();
+            }
+        }
+        
+        function logout() {
+            document.getElementById('logoutModal').style.display = 'block';
+        }
+        
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'none';
+        }
+        
+        function confirmLogout() {
+            window.location.href = '/logout';
+        }
+        
+        function reportScam(domain) {
+            currentReportDomain = domain;
+            document.getElementById('reportDomain').textContent = domain;
+            document.getElementById('reportModal').style.display = 'block';
+        }
+        
+        function closeReportModal() {
+            document.getElementById('reportModal').style.display = 'none';
+            currentReportDomain = null;
+        }
+        
+        function confirmReport() {
+            if (!currentReportDomain) return;
+            
+            fetch('/report/' + currentReportDomain, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                closeReportModal();
+                // Show success notification
+                const notification = document.createElement('div');
+                notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 3000; animation: slideIn 0.3s;';
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <div>
+                            <strong>Report Submitted!</strong><br>
+                            <small>Total reports for ${currentReportDomain}: ${data.total_reports}</small>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+                setTimeout(() => {
+                    notification.style.animation = 'fadeOut 0.3s';
+                    setTimeout(() => {
+                        notification.remove();
+                        location.reload();
+                    }, 300);
+                }, 3000);
+            })
+            .catch(error => {
+                closeReportModal();
+                alert('Error submitting report. Please try again.');
+            });
+        }
+        
+        function filterEmails(category) {
+            // Move slider
+            const slider = document.querySelector('.slider');
+            const radioInputs = document.querySelectorAll('input[name="emailFilter"]');
+            let selectedIndex = 0;
+            
+            radioInputs.forEach((input, index) => {
+                if (input.checked) {
+                    selectedIndex = index;
+                }
+            });
+            
+            // Calculate slider position (5 options, each 20% width)
+            const positions = ['4px', 'calc(20% + 2px)', 'calc(40%)', 'calc(60% - 2px)', 'calc(80% - 4px)'];
+            slider.style.left = positions[selectedIndex];
+            
+            // Filter email rows (only filter main rows, not body analysis rows)
+            const rows = document.querySelectorAll('.email-table tbody tr:not(.email-body-row)');
+            rows.forEach(row => {
+                const bodyRow = row.nextElementSibling;
+                if (category === 'all') {
+                    row.style.display = '';
+                } else {
+                    const rowCategory = row.getAttribute('data-category');
+                    if (rowCategory === category) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                        // Also hide body row if email is hidden
+                        if (bodyRow && bodyRow.classList.contains('email-body-row')) {
+                            bodyRow.style.display = 'none';
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Refresh emails function
+        function refreshEmails() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            // Show loading overlay
+            loadingOverlay.classList.add('show');
+            
+            // Reload the page to fetch new emails
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        }
+        
+        // Auto-refresh every 60 seconds
+        let autoRefreshInterval;
+        function startAutoRefresh() {
+            autoRefreshInterval = setInterval(() => {
+                console.log('Auto-refreshing emails...');
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                loadingOverlay.classList.add('show');
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }, 60000); // 60 seconds
+        }
+        
+        // Stop auto-refresh
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+        }
+        
+        // Show notification when new emails are detected
+        function showRefreshNotification(newEmailCount) {
+            if (newEmailCount > 0) {
+                const notification = document.createElement('div');
+                notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 3000; animation: slideIn 0.3s; cursor: pointer;';
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                        <div>
+                            <strong>${newEmailCount} New Email${newEmailCount > 1 ? 's' : ''}</strong><br>
+                            <small>Click to refresh</small>
+                        </div>
+                    </div>
+                `;
+                notification.onclick = () => location.reload();
+                document.body.appendChild(notification);
+                setTimeout(() => {
+                    notification.style.animation = 'fadeOut 0.3s';
+                    setTimeout(() => notification.remove(), 300);
+                }, 5000);
+            }
+        }
+        
+        // Show all emails by default on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            filterEmails('all');
+            startAutoRefresh();
+            
+            // Show auto-refresh status notification
+            const statusNotif = document.createElement('div');
+            statusNotif.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: rgba(59, 130, 246, 0.9); color: white; padding: 10px 20px; border-radius: 6px; font-size: 12px; z-index: 2999; animation: slideIn 0.3s;';
+            statusNotif.innerHTML = '🔄 Auto-refresh enabled (every 60s)';
+            document.body.appendChild(statusNotif);
+            setTimeout(() => {
+                statusNotif.style.animation = 'fadeOut 0.3s';
+                setTimeout(() => statusNotif.remove(), 300);
+            }, 3000);
+        });
+        
+        // Stop auto-refresh when user navigates away
+        window.addEventListener('beforeunload', stopAutoRefresh);
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishGuard - Email Security</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="display: flex; align-items: center; gap: 15px; justify-content: center;">
+                <img src="{{ url_for('static', filename='icon.png') }}" alt="ShieldX Logo" style="width: 60px; height: 60px; border-radius: 10px;">
+                <h1>ShieldX</h1>
+            </div>
+            <p class="tagline">Protect yourself from phishing attacks</p>
+        </header>
+        
+        <main>
+            <div class="hero">
+                <h2>Secure Your Inbox</h2>
+                <p>PhishGuard analyzes your emails in real-time to detect potential phishing attempts and protect your personal information.</p>
+                
+                <div class="features">
+                    <div class="feature">
+                        <h3>&#x1F50D; Smart Detection</h3>
+                        <p>Advanced algorithms identify suspicious patterns</p>
+                    </div>
+                    <div class="feature">
+                        <h3>&#x26A1; Real-time Analysis</h3>
+                        <p>Instant risk assessment for every email</p>
+                    </div>
+                    <div class="feature">
+                        <h3>&#x1F3AF; Risk Scoring</h3>
+                        <p>Clear risk levels: Low, Medium, High</p>
+                    </div>
+                </div>
+                
+                <div class="cta">
+                    <a href="{{ url_for('authorize') }}" class="btn-primary">Connect Gmail Account</a>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Your privacy is important. PhishGuard only reads email metadata.</p>
+        </footer>
+    </div>
+</body>
+</html>

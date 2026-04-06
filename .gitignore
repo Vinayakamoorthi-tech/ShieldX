@@ -1,0 +1,7 @@
+.venv/
+**/.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+email_ml_project/Data/multi csv/dataset3/phishing_email.csv

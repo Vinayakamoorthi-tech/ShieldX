@@ -1,0 +1,38 @@
+<svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="shieldGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ffff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0080ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00ffff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Outer shield frame -->
+  <path d="M 400 100 L 600 200 L 650 400 L 550 600 L 400 680 L 250 600 L 150 400 L 200 200 Z" 
+        fill="none" stroke="url(#shieldGlow)" stroke-width="15" filter="url(#glow)" opacity="0.8"/>
+  
+  <!-- Middle shield frame -->
+  <path d="M 400 150 L 550 230 L 590 400 L 510 570 L 400 640 L 290 570 L 210 400 L 250 230 Z" 
+        fill="none" stroke="url(#shieldGlow)" stroke-width="12" filter="url(#glow)"/>
+  
+  <!-- Inner shield -->
+  <path d="M 400 200 L 500 260 L 530 400 L 470 540 L 400 590 L 330 540 L 270 400 L 300 260 Z" 
+        fill="rgba(0, 20, 80, 0.8)" stroke="url(#shieldGlow)" stroke-width="8" filter="url(#glow)"/>
+  
+  <!-- Mail envelope -->
+  <rect x="320" y="330" width="160" height="120" rx="8" 
+        fill="none" stroke="url(#shieldGlow)" stroke-width="8" filter="url(#glow)"/>
+  <path d="M 320 330 L 400 390 L 480 330" 
+        fill="none" stroke="url(#shieldGlow)" stroke-width="8" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M 400 380 L 400 410" 
+        fill="none" stroke="url(#shieldGlow)" stroke-width="6" stroke-linecap="round" filter="url(#glow)"/>
+  <polyline points="390 405 400 415 410 405" 
+        fill="none" stroke="url(#shieldGlow)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+</svg>

@@ -1,0 +1,105 @@
+SPAM_KEYWORDS = [
+    "buy now",
+    "limited offer",
+    "special promotion",
+    "free trial",
+    "discount",
+    "sale ends",
+    "exclusive deal",
+    "win prize",
+    "congratulations",
+    "claim offer",
+    "free gift",
+    "promo code",
+    "best price",
+    "order now",
+    "shop today"
+]
+
+PHISHING_KEYWORDS = [
+    "verify your account",
+    "confirm your identity",
+    "unusual activity",
+    "unauthorized login",
+    "account suspended",
+    "account locked",
+    "security alert",
+    "reset your password",
+    "login immediately",
+    "update your account",
+    "confirm your information",
+    "failure to verify",
+    "access restricted",
+    "permanently suspended",
+    "click the link below",
+    "suspicious sign-in"
+]
+
+PHISHING_HELPERS = [
+    "urgent",
+    "immediately",
+    "act now",
+    "final notice",
+    "important",
+    "click here"
+]
+
+JOB_CONTEXT_KEYWORDS = [
+    "job",
+    "hiring",
+    "recruitment",
+    "career",
+    "offer letter",
+    "hr"
+]
+
+FAKE_JOB_KEYWORDS = [
+    "no interview required",
+    "direct offer",
+    "urgent hiring",
+    "limited slots",
+    "registration fee",
+    "training fee",
+    "initial payment",
+    "pay now",
+    "processing fee",
+    "security deposit",
+    "whatsapp hr",
+    "telegram hr",
+    "contact hr on whatsapp",
+    "work from home guaranteed",
+    "easy hiring process"
+]
+
+URGENCY_KEYWORDS = [
+    "immediately",
+    "asap",
+    "within 24 hours",
+    "urgent",
+    "limited time",
+    "act fast"
+]
+
+FREE_EMAIL_DOMAINS = [
+    "gmail.com",
+    "yahoo.com",
+    "outlook.com",
+    "hotmail.com",
+    "rediffmail.com",
+    "zoho.com"
+]
+
+BRAND_KEYWORDS = [
+    "amazon",
+    "paypal",
+    "google",
+    "microsoft",
+    "apple",
+    "facebook",
+    "netflix",
+    "stripe",
+    "bank",
+    "wellsfargo",
+    "chase",
+    "paypal"
+]
