@@ -5,3 +5,9 @@ __pycache__/
 *.pyo
 *.pyd
 email_ml_project/Data/multi csv/dataset3/phishing_email.csv
+
+# Ignore generated Flutter build artifacts
+App/**/build/
+
+# Exclude oversized dataset file (>100MB) blocked by GitHub
+Data Sets/emails.csv
